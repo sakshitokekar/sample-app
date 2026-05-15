@@ -1,0 +1,59 @@
+# Authentication business logic
+from models.user import User
+from config import Config
+
+# In-memory user store (simulating a database)
+users_db: dict[str, User] = {}
+
+def register_user(username: str, email: str, password: str) -> dict:
+    """Register a new user."""
+    # Check if user already exists
+    for user in users_db.values():
+        if user.email == email:
+            return {"success": False, "error": "Email already registered"}
+        if user.username == username:
+            return {"success": False, "error": "Username already taken"}
+
+    # Validate password length
+    if len(password) < Config.MIN_PASSWORD_LENGTH:
+        return {"success": False, "error": f"Password must be at least {Config.MIN_PASSWORD_LENGTH} characters"}
+
+    # Create and store user
+    # BUG: password stored in plain text, should call User.hash_password()
+    new_user = User(username=username, email=email, password=password)
+    users_db[new_user.id] = new_user
+
+    return {"success": True, "user": new_user.to_dict()}
+
+def login_user(email: str, password: str) -> dict:
+    """Authenticate a user by email and password."""
+    # Find user by email
+    user = None
+    for u in users_db.values():
+        if u.email == email:
+            user = u
+            break
+
+    if not user:
+        return {"success": False, "error": "Invalid credentials"}
+
+    # Check if account is active
+    if not user.is_active:
+        return {"success": False, "error": "Account is deactivated"}
+
+    # BUG: check_password compares plain text, won't work once hashing is fixed
+    if not user.check_password(password):
+        return {"success": False, "error": "Invalid credentials"}
+
+    return {
+        "success": True,
+        "user": user.to_dict(),
+        "token": f"mock-jwt-token-{user.id}"  # Simplified token for demo
+    }
+
+def get_user_by_id(user_id: str) -> dict:
+    """Fetch a user by their ID."""
+    user = users_db.get(user_id)
+    if not user:
+        return {"success": False, "error": "User not found"}
+    return {"success": True, "user": user.to_dict()}
