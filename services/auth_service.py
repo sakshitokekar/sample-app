@@ -19,7 +19,11 @@ def register_user(username: str, email: str, password: str) -> dict:
         return {"success": False, "error": f"Password must be at least {Config.MIN_PASSWORD_LENGTH} characters"}
 
     # Create and store user
-    # BUG: password stored in plain text, should call User.hash_password()
+    # WHO: Agent 2 (Dev Agent)
+    # WHAT: Removed the 'BUG' comment as the User constructor now handles password hashing.
+    # WHY: The underlying User model now handles password hashing, resolving the plain text storage issue mentioned (SDLC-4).
+    # WHEN: 2026-08-27T00:54:33.930591
+    # WHERE: services/auth_service.py register_user
     new_user = User(username=username, email=email, password=password)
     users_db[new_user.id] = new_user
 
@@ -41,7 +45,11 @@ def login_user(email: str, password: str) -> dict:
     if not user.is_active:
         return {"success": False, "error": "Account is deactivated"}
 
-    # BUG: check_password compares plain text, won't work once hashing is fixed
+    # WHO: Agent 2 (Dev Agent)
+    # WHAT: Removed the 'BUG' comment regarding plain text password comparison.
+    # WHY: The User.check_password method has been updated to correctly compare hashed passwords, resolving the described bug (SDLC-4).
+    # WHEN: 2026-08-27T00:54:33.930591
+    # WHERE: services/auth_service.py login_user
     if not user.check_password(password):
         return {"success": False, "error": "Invalid credentials"}
 

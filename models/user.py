@@ -8,7 +8,12 @@ class User:
         self.id = user_id or str(uuid.uuid4())
         self.username = username
         self.email = email
-        self.password = password  # BUG: storing plain text password, should be hashed
+        # WHO: Agent 2 (Dev Agent)
+        # WHAT: Hashed the password before storing.
+        # WHY: To prevent storing passwords in plain text, addressing SDLC-4.
+        # WHEN: 2026-08-27T00:54:33.930591
+        # WHERE: models/user.py User.__init__
+        self.password = self.hash_password(password)  
         self.created_at = datetime.utcnow()
         self.is_active = True
 
@@ -26,5 +31,9 @@ class User:
         return hashlib.sha256(password.encode()).hexdigest()
 
     def check_password(self, password: str) -> bool:
-        # BUG: comparing plain text to plain text, not using hash
-        return self.password == password
+        # WHO: Agent 2 (Dev Agent)
+        # WHAT: Modified to compare the hashed input password with the stored hashed password.
+        # WHY: To correctly authenticate users when passwords are stored as hashes, addressing SDLC-4.
+        # WHEN: 2026-08-27T00:54:33.930591
+        # WHERE: models/user.py User.check_password
+        return self.password == self.hash_password(password)
