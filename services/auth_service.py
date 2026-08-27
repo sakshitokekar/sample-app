@@ -18,7 +18,12 @@ def register_user(username: str, email: str, password: str) -> dict:
     # WHY: To ensure consistent, case-insensitive email handling, preventing login issues (SDLC-3).
     # WHEN: 2026-08-27T04:36:27.863317
     # WHERE: services/auth_service.py register_user
-    email = email.lower()  
+    # WHO: Agent 2 (Dev Agent)
+    # WHAT: Stripped whitespace and normalized email to lowercase.
+    # WHY: To fix login issues on mobile apps where users might accidentally include leading/trailing spaces in their email input (SDLC-8).
+    # WHEN: 2026-08-28T12:00:00.000000
+    # WHERE: services/auth_service.py login_user
+    email = email.strip().lower()
     
     # Check if user already exists
     for user in users_db.values():
@@ -49,7 +54,12 @@ def login_user(email: str, password: str) -> dict:
     # WHY: To ensure consistent, case-insensitive email lookup, fixing login issues (SDLC-3).
     # WHEN: 2026-08-27T04:36:27.863317
     # WHERE: services/auth_service.py login_user
-    email = email.lower()  
+    # WHO: Agent 2 (Dev Agent)
+    # WHAT: Stripped whitespace and normalized email to lowercase.
+    # WHY: To fix login issues on mobile apps where users might accidentally include leading/trailing spaces in their email input (SDLC-8).
+    # WHEN: 2026-08-28T12:00:00.000000
+    # WHERE: services/auth_service.py login_user
+    email = email.strip().lower()
     
     # Find user by email
     user = None
