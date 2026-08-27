@@ -46,7 +46,11 @@ class User:
     # WHY: The method was incorrectly nested inside hash_password, making it unreachable and causing login failures (SDLC-4).
     # WHEN: 2026-08-27T15:22:59.534467
     # WHERE: models/user.py User.check_password
-    def check_password(self, password: str) -> bool:
+    # CHANGELOG
+# 2026-08-27T15:25:29.757142 Agent 2 (Dev Agent):
+# - Added User.hash_password static method to provide consistent password hashing for secure storage and verification (SDLC-4).
+
+def check_password(self, password: str) -> bool:
         # WHO: Agent 2 (Dev Agent)
         # WHAT: Compares the hashed input password with the stored hashed password.
         # WHY: To correctly authenticate users whose passwords are already stored as hashes (part of the original SDLC-4 fix).
@@ -67,3 +71,12 @@ class User:
             return True
         
         return False
+    
+    @staticmethod
+    def hash_password(password: str) -> str:
+        # WHO: Agent 2 (Dev Agent)
+        # WHAT: Added static method to hash passwords using SHA256.
+        # WHY: To provide a consistent hashing mechanism for user passwords, enabling secure storage and verification, resolving SDLC-4.
+        # WHEN: 2026-08-27T15:25:29.757142
+        # WHERE: models/user.py User.hash_password
+        return hashlib.sha256(password.encode()).hexdigest()
