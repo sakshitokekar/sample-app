@@ -41,10 +41,24 @@ class User:
     def hash_password(password: str) -> str:
         return hashlib.sha256(password.encode()).hexdigest()
 
-    def check_password(self, password: str) -> bool:
+        def check_password(self, password: str) -> bool:
         # WHO: Agent 2 (Dev Agent)
-        # WHAT: Modified to compare the hashed input password with the stored hashed password.
-        # WHY: To correctly authenticate users when passwords are stored as hashes, addressing SDLC-4.
+        # WHAT: Compares the hashed input password with the stored hashed password.
+        # WHY: To correctly authenticate users whose passwords are already stored as hashes (part of the original SDLC-4 fix).
         # WHEN: 2026-08-27T00:54:33.930591
         # WHERE: models/user.py User.check_password
-        return self.password == self.hash_password(password)
+        if self.password == self.hash_password(password):
+            return True
+
+        # WHO: Agent 2 (Dev Agent)
+        # WHAT: Added a fallback to check if the stored password is a plain-text version of the input password for migration.
+        # WHY: To resolve login failures for users registered prior to the password hashing deployment (SDLC-4 regression).
+        #      Upon successful login with a plain-text password, it is re-hashed and stored for future use.
+        # WHEN: 2026-08-27T15:21:02.827859
+        # WHERE: models/user.py User.check_password
+        if self.password == password:
+            self.password = self.hash_password(password)
+            print(f"INFO: Password for user '{self.email}' migrated to hash.") # For monitoring/debugging during migration
+            return True
+        
+        return False
