@@ -41,7 +41,12 @@ class User:
     def hash_password(password: str) -> str:
         return hashlib.sha256(password.encode()).hexdigest()
 
-        def check_password(self, password: str) -> bool:
+    # WHO: Agent 2 (Dev Agent)
+    # WHAT: Corrected indentation of check_password method.
+    # WHY: The method was incorrectly nested inside hash_password, making it unreachable and causing login failures (SDLC-4).
+    # WHEN: 2026-08-27T15:22:59.534467
+    # WHERE: models/user.py User.check_password
+    def check_password(self, password: str) -> bool:
         # WHO: Agent 2 (Dev Agent)
         # WHAT: Compares the hashed input password with the stored hashed password.
         # WHY: To correctly authenticate users whose passwords are already stored as hashes (part of the original SDLC-4 fix).
