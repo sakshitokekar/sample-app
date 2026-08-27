@@ -71,3 +71,15 @@ def test_login_plain_text_password_migration():
     # Verify password remains hashed after second login attempt
     migrated_user_after_second_login = users_db.get(user_email)
     assert migrated_user_after_second_login.password == hashlib.sha256(plain_password.encode()).hexdigest()
+
+def test_login_with_whitespace_email():
+    register_user("eve", "eve@example.com", "password123")
+    result = login_user("  eve@example.com ", "password123")
+    assert result["success"] == True
+    assert "token" in result
+
+def test_register_with_whitespace_email():
+    result = register_user("frank", " frank@example.com ", "password123")
+    assert result["success"] == True
+    login_result = login_user("frank@example.com", "password123")
+    assert login_result["success"] == True
