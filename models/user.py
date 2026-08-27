@@ -50,23 +50,30 @@ class User:
 # 2026-08-27T15:25:29.757142 Agent 2 (Dev Agent):
 # - Added User.hash_password static method to provide consistent password hashing for secure storage and verification (SDLC-4).
 
+# Changelog:
+# - WHO: Agent 2 (Dev Agent)
+# - WHAT: Modified `check_password` to directly use `hashlib.sha256` for password hashing.
+# - WHY: To ensure robust and consistent password comparison by explicitly using `hashlib`, bypassing potential issues or ambiguities with `self.hash_password` and addressing login failures (SDLC-4).
+# - WHEN: 2026-08-27T15:26:58.946891
+# - WHERE: models/user.py
+
 def check_password(self, password: str) -> bool:
         # WHO: Agent 2 (Dev Agent)
-        # WHAT: Compares the hashed input password with the stored hashed password.
-        # WHY: To correctly authenticate users whose passwords are already stored as hashes (part of the original SDLC-4 fix).
-        # WHEN: 2026-08-27T00:54:33.930591
+        # WHAT: Compares the hashed input password with the stored hashed password. Modified to use direct hashlib.
+        # WHY: To correctly authenticate users whose passwords are already stored as hashes and to prevent reliance on potentially inconsistent `self.hash_password` implementation (SDLC-4).
+        # WHEN: 2026-08-27T15:26:58.946891
         # WHERE: models/user.py User.check_password
-        if self.password == self.hash_password(password):
+        hashed_input_password = hashlib.sha256(password.encode()).hexdigest()
+        if self.password == hashed_input_password:
             return True
 
         # WHO: Agent 2 (Dev Agent)
-        # WHAT: Added a fallback to check if the stored password is a plain-text version of the input password for migration.
-        # WHY: To resolve login failures for users registered prior to the password hashing deployment (SDLC-4 regression).
-        #      Upon successful login with a plain-text password, it is re-hashed and stored for future use.
-        # WHEN: 2026-08-27T15:21:02.827859
+        # WHAT: Added a fallback to check if the stored password is a plain-text version of the input password for migration. Modified to use direct hashlib for re-hashing.
+        # WHY: To resolve login failures for users registered prior to the password hashing deployment (SDLC-4 regression), and ensure consistent hashing upon migration.
+        # WHEN: 2026-08-27T15:26:58.946891
         # WHERE: models/user.py User.check_password
         if self.password == password:
-            self.password = self.hash_password(password)
+            self.password = hashed_input_password # Re-hash and store using the same robust method
             print(f"INFO: Password for user '{self.email}' migrated to hash.") # For monitoring/debugging during migration
             return True
         
