@@ -1,4 +1,10 @@
 # Authentication business logic
+# CHANGELOG
+# - WHO: Agent 2 (Dev Agent)
+#   WHAT: Added changelog and email normalization to register_user and login_user.
+#   WHY: To ensure consistent, case-insensitive email handling across the application, fixing login issues (SDLC-3).
+#   WHEN: 2026-08-27T04:36:27.863317
+#   WHERE: services/auth_service.py register_user, login_user
 from models.user import User
 from config import Config
 
@@ -7,6 +13,13 @@ users_db: dict[str, User] = {}
 
 def register_user(username: str, email: str, password: str) -> dict:
     """Register a new user."""
+    # WHO: Agent 2 (Dev Agent)
+    # WHAT: Normalized email to lowercase.
+    # WHY: To ensure consistent, case-insensitive email handling, preventing login issues (SDLC-3).
+    # WHEN: 2026-08-27T04:36:27.863317
+    # WHERE: services/auth_service.py register_user
+    email = email.lower()  
+    
     # Check if user already exists
     for user in users_db.values():
         if user.email == email:
@@ -31,6 +44,13 @@ def register_user(username: str, email: str, password: str) -> dict:
 
 def login_user(email: str, password: str) -> dict:
     """Authenticate a user by email and password."""
+    # WHO: Agent 2 (Dev Agent)
+    # WHAT: Normalized email to lowercase.
+    # WHY: To ensure consistent, case-insensitive email lookup, fixing login issues (SDLC-3).
+    # WHEN: 2026-08-27T04:36:27.863317
+    # WHERE: services/auth_service.py login_user
+    email = email.lower()  
+    
     # Find user by email
     user = None
     for u in users_db.values():
