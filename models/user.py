@@ -57,7 +57,7 @@ class User:
 # - WHEN: 2026-08-27T15:26:58.946891
 # - WHERE: models/user.py
 
-def check_password(self, password: str) -> bool:
+    def check_password(self, password: str) -> bool:
         # WHO: Agent 2 (Dev Agent)
         # WHAT: Compares the hashed input password with the stored hashed password. Modified to use direct hashlib.
         # WHY: To correctly authenticate users whose passwords are already stored as hashes and to prevent reliance on potentially inconsistent `self.hash_password` implementation (SDLC-4).
